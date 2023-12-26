@@ -5,4 +5,48 @@
   
 * Usage
 
+** Clone the repo
+
+#+NAME: https://github.com/wagnermarques/srv-tomcat.git
+#+BEGIN_SRC shell :session s1 :results output :exports both
+  cd $HOME
+  git clone https://github.com/wagnermarques/srv-tomcat.git
+#+END_SRC
+
+** Starts the server
+#+NAME:
+#+BEGIN_SRC shell :session s1 :results output :exports both 
+  cd $HOME/srv-tomcat/bin
+  ./docker-compose-up.sh 
+#+END_SRC
+
+** Create a webapp with maven
+#+NAME:
+#+BEGIN_SRC shell :session s1 :results output :exports both 
+  cd $HOME/srv-tomcat/apps
+  mvn archetype:genereate #choose a web archetype or
+#+END_SRC
+
+this repo brings a hellow world web app inside apps dir. You can
+deploy this web app and skip the creation of the project.
+
+** build webapp as a war file
+#+NAME:
+#+BEGIN_SRC shell :session s1 :results output :exports both 
+  cd $HOME/srv-tomcat/apps/appweb
+  mvn package
+#+END_SRC
+
+** deplploy any war file $HOME/srv-tomcat/apps/appweb dir in tomcat
+
+#+NAME:
+#+BEGIN_SRC shell :session s1 :results output :exports both 
+  cd $HOME/srv-tomcat/bin
+  ./deploy-all.sh
+#+END_SRC
+
+
+** Acess http://localhost:8080/appweb
+
+
 
