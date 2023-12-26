@@ -1,0 +1,75 @@
+---
+- name: Build Tomcat Container
+  hosts: localhost
+  become: yes
+  gather_facts: true
+  vars:
+    FACT_ENV_USER: "{{ansible_facts.env.USER }}"
+    FACT_ENV_SUDO_GID: "{{ ansible_facts.env.SUDO_GID }}"
+    FACT_ENV_SUDO_UID: "{{ ansible_facts.env.SUDO_UID }}"
+    FACT_ENV_LOGNAME: "{{ ansible_facts.env.LOGNAME }}"
+    FACT_ENV_LANG: "{{ ansible_facts.env.LANG }}"
+    FACT_HOSTNAME: "{{ ansible_facts.hostname }}"
+    FACT_LSB_DESCRIPTION: "{{ ansible_facts.lsb.description }}"
+    FACT_LSB_ID: "{{ ansible_facts.lsb.id }}"
+    FACT_LSB_MAJOR_RELEASE: "{{ ansible_facts.lsb.major_release }}"
+    FACT_LSB_RELEASE: "{{ ansible_facts.lsb.release }}"
+    FACT_PYTHON_EXECUTABLE: "{{ ansible_facts.python.executable }}"
+    FACT_PYTHON_HAS_SSLCONTEXT: "{{ ansible_facts.python.has_sslcontext }}"
+    FACT_PYTHON_VERSION: "{{ ansible_facts.python_version }}"
+    FACT_USER_GID: "{{ ansible_facts.user_gid }}"
+    FACT_USER_ID: "{{ ansible_facts.user_id }}"
+    FACT_USER_UID: "{{ ansible_facts.user_uid }}"
+  vars_files:
+    - "{{ 'vars-dev-env.yml' if AMBIENTE_DE == 'dev' else 'vars-prod-env.yml' }}"
+
+  tasks:    
+
+    #Printing some build variables if this build is in debug mode
+    - name: DevEnv - Check environment type running (dev or prod)
+      set_fact:
+        env_type: "{{ env_type | default('dev') }}"
+        
+    - name: DevEnv - Debug Mode - Printing ansible facts
+      include_tasks: ./tasks-print-ansible-facts.yml
+      when: RUN_IN_DEBUG_MODE == "true"
+
+   # creating the docker network
+    - name: DevEnv - Creating Docker containers network
+      include_tasks: ./tasks-docker-network-dev.yml
+        
+   # building apache2 container for dev env
+#    - name: Dev Env - Building apache2 container for dev env
+#      include_tasks: ./infra-apache2-container/tasks-dev.yml
+#      when: AMBIENTE_DE == "dev"
+
+    - name: Dev Env - Building php8-fpm container for dev env
+      include_tasks: ./infra-php-fpm-container/tasks-dev.yml
+      when: AMBIENTE_DE == "dev"      
+
+    - name: Dev Env - Building mariadb container for dev env
+      include_tasks: ./infra-mariadb-container/tasks-dev.yml
+      when: AMBIENTE_DE == "dev"
+     
+    - name: Dev Env - Building nginx container for dev env
+      include_tasks: ./infra-nginx-container/tasks-dev.yml
+      when: AMBIENTE_DE == "dev"
+
+#    - name: Debug Mode - Install Network Tools in containers
+#      include_tasks: ./tasks-install-networktools-in-containers.yml
+#      when: RUN_IN_DEBUG_MODE == "true"
+      
+
+
+#    location / {
+#        try_files $uri $uri/ @proxy;
+#    }
+#
+#    location @proxy {
+#        proxy_pass http://moodle-service-apache2-service-dev;
+#        proxy_set_header Host $host;
+#        proxy_set_header X-Real-IP $remote_addr;
+#        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#        proxy_set_header X-Forwarded-Proto $scheme;
+#    }
+    

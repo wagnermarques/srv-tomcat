@@ -1,0 +1,18 @@
+#+Title Apps dir
+
+This directory is where we can create our web projects
+
+It's not mandatory to use this directory in any way. To use this
+tomcat container we just need to copy our .war file inside webapp
+directory tha is mounted inside tomcat webapps dir inside the
+container.
+
+Why to use this dir, so?
+
+There are a script ./bin/deploy-all.sh that search for any war files
+inside this directory and copy them to the webapp.
+
+To usage the script do the folowwing:
+
+cd /thisCLonedRepoDirectory/bin
+./deploy-all.sh
